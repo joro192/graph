@@ -66,8 +66,6 @@ int main()
 {
     double density = 0.2;
 
-    //bai 1
-
     string filePath20 = "directedGraph20.txt";
 
     Graph graph20(20, density, DIRECTED, NON_WEIGHT_MATRIX);
@@ -163,56 +161,6 @@ int main()
     printArray(dfs100lt, filePath100);
     printArray(bfs100ke, filePath100);
     printArray(bfs100lt, filePath100);
-
-    // bai 5
-
-    // string filePath20 = "scalarGraph20.txt";
-
-    // Graph graph20(10, density, SCALAR, WEIGHT_MATRIX);
-
-    // vector<vector<int> > adjMatrix20 = graph20.getAdjMatrix();
-    // vector<vector<int> > listAdjacentPoint20 = graph20.getListAdjacentPoint();
-    // vector<Edge> listEdge20 = graph20.getListEdge();
-    // vector<vector<int> > incidenceMatrix20 = graph20.getIncidenceMatrix();
-    // vector<int> column20(listEdge20.size(), 0);
-    // vector<int> edge20(listEdge20.size(), 0);
-
-    // printMatrix(adjMatrix20, filePath20);
-    // printMatrix(incidenceMatrix20, filePath20);
-    // printEdge(listEdge20, filePath20);
-    // printListAdjacentPoint(listAdjacentPoint20, filePath20);
-
-    // string filePath50 = "scalarGraph50.txt";
-
-    // Graph graph50(50, density, SCALAR, WEIGHT_MATRIX);
-
-    // vector<vector<int> > adjMatrix50 = graph50.getAdjMatrix();
-    // vector<vector<int> > listAdjacentPoint50 = graph50.getListAdjacentPoint();
-    // vector<Edge> listEdge50 = graph50.getListEdge();
-    // vector<vector<int> > incidenceMatrix50 = graph50.getIncidenceMatrix();
-    // vector<int> column50(listEdge50.size(), 0);
-    // vector<int> edge50(listEdge50.size(), 0);
-
-    // printMatrix(adjMatrix50, filePath50);
-    // printMatrix(incidenceMatrix50, filePath50);
-    // printEdge(listEdge50, filePath50);
-    // printListAdjacentPoint(listAdjacentPoint50, filePath50);
-
-    // string filePath100 = "scalarGraph100.txt";
-
-    // Graph graph100(100, density, SCALAR, WEIGHT_MATRIX);
-
-    // vector<vector<int> > adjMatrix100 = graph100.getAdjMatrix();
-    // vector<vector<int> > listAdjacentPoint100 = graph100.getListAdjacentPoint();
-    // vector<Edge> listEdge100 = graph100.getListEdge();
-    // vector<vector<int> > incidenceMatrix100 = graph100.getIncidenceMatrix();
-    // vector<int> column100(listEdge100.size(), 0);
-    // vector<int> edge100(listEdge100.size(), 0);
-
-    // printMatrix(adjMatrix100, filePath100);
-    // printMatrix(incidenceMatrix100, filePath100);
-    // printEdge(listEdge100, filePath100);
-    // printListAdjacentPoint(listAdjacentPoint100, filePath100);
 
     return 0;
 }
