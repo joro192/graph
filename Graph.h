@@ -276,6 +276,7 @@ vector<int> Graph::dfsStack(int startPoint, int typeMatrix)
         listVisitPoint = column;
 
         stackPoint.push(startPoint);
+        dfs.push_back(stackPoint.top());
         cout << stackPoint.top() + 1 << "->";
         while (!stackPoint.empty())
         {
@@ -315,6 +316,7 @@ vector<int> Graph::dfsStack(int startPoint, int typeMatrix)
         listVisitPoint = column;
 
         stackPoint.push(startPoint);
+        dfs.push_back(stackPoint.top());
         cout << stackPoint.top() + 1 << "->";
         // thăm đỉnh đầu tiên
         listVisitPoint[stackPoint.top()] = 1;
@@ -375,6 +377,7 @@ vector<int> Graph::bfsQueue(int startPoint, int typeMatrix)
         listVisitPoint = column;
 
         queuePoint.push(startPoint);
+        bfs.push_back(queuePoint.front());
         isInQueue[startPoint] = 1;
         while (!queuePoint.empty())
         {
@@ -410,6 +413,7 @@ vector<int> Graph::bfsQueue(int startPoint, int typeMatrix)
         listVisitEdge = edge;
 
         queuePoint.push(startPoint);
+        bfs.push_back(queuePoint.front());
         // đánh dấu đỉnh bắt đầu đã vào queue
         isInQueue[startPoint] = 1;
 
