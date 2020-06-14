@@ -1,5 +1,3 @@
-// A C++ program for Bellman-Ford's single source
-// shortest path algorithm.
 #include <iostream>
 #include "Graph.h"
 
