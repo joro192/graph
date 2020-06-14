@@ -6,6 +6,7 @@
 #include <fstream>
 #include <queue>
 #include <stack>
+#include <algorithm>
 
 using namespace std;
 
@@ -16,7 +17,7 @@ const int SCALAR = 0;
 const int DIRECTED = 1;
 
 const int MIN_WEIGHT = 1;
-const int MAX_WEIGHT = 20;
+const int MAX_WEIGHT = 10;
 
 const bool WEIGHT_MATRIX = 1;
 const bool NON_WEIGHT_MATRIX = 0;
@@ -31,6 +32,7 @@ struct Edge
 class Graph
 {
 public:
+    int size;
     Graph(int, double, int, bool);
     Graph(string);
     vector<vector<int> > getAdjMatrix();
@@ -43,13 +45,20 @@ public:
     vector<int> bfsQueue(int, int);
     vector<int> listVisitPoint;
     vector<int> listVisitEdge;
+    bool checkDirected();
+    int deg(int);
+    int numberOfConnectedComponent();
+    bool isConnected();
+    bool isEulerian();
+    void removeEdge(int, int);
+    vector<int> eulerianPath();
 
 private:
-    int size;
     double density;
     int numberOfEdge;
     bool isDirected;
     bool isWeight;
+    int startPointEulerian = 0;
     vector<vector<int> > adjMatrix;
     vector<vector<int> > listAdjacentPoint;
     vector<vector<int> > incidenceMatrix;
@@ -120,7 +129,7 @@ Graph::Graph(int numberOfVertex, double ratio, int typeMatrix, bool isWeightMatr
                 }
             }
         }
-        density = double(2*numberOfEdge) / (size * size);
+        density = double(2 * numberOfEdge) / (size * size);
         isDirected = false;
         vector<int> edge(numberOfEdge, 0);
         listVisitEdge = edge;
@@ -139,14 +148,40 @@ Graph::Graph(string filePath)
     input >> size;
     for (int i = 0; i < size; i++)
     {
+        Edge temp;
         vector<int> tempv;
         for (int j = 0; j < size; j++)
         {
             input >> delimiter;
             tempv.push_back(delimiter);
+
+            if (delimiter != 0)
+            {
+                temp.firstPoint = i;
+                temp.endPoint = j;
+                temp.weight = delimiter;
+                listEdge.push_back(temp);
+            }
         }
         adjMatrix.push_back(tempv);
     }
+
+    isDirected = checkDirected();
+}
+
+bool Graph::checkDirected()
+{
+    bool check = SCALAR;
+    for (int i = 0; i < size; i++)
+    {
+        for (int j = i + 1; j < size; j++)
+        {
+            if (adjMatrix[i][j] != adjMatrix[j][i])
+                check = DIRECTED;
+        }
+    }
+
+    return check;
 }
 
 vector<vector<int> > Graph::getAdjMatrix()
@@ -192,19 +227,23 @@ vector<vector<int> > Graph::convertToUnDirectedGraph()
 
 vector<vector<int> > Graph::getListAdjacentPoint()
 {
-    vector<vector<int> > adjUnDirectesMatrix = convertToUnDirectedGraph();
+    // vector<vector<int> > adjUnDirectesMatrix = convertToUnDirectedGraph();
+    vector<vector<int> > temp;
     for (int i = 0; i < size; i++)
     {
         vector<int> tempv;
         for (int j = 0; j < size; j++)
         {
-            if (adjUnDirectesMatrix[i][j] > 0)
+            if (adjMatrix[i][j] != 0)
             {
                 tempv.push_back(j);
             }
         }
-        listAdjacentPoint.push_back(tempv);
+        temp.push_back(tempv);
     }
+
+    listAdjacentPoint = temp;
+
     return listAdjacentPoint;
 }
 
@@ -277,7 +316,7 @@ vector<int> Graph::dfsStack(int startPoint, int typeMatrix)
 
         stackPoint.push(startPoint);
         dfs.push_back(stackPoint.top());
-        cout << stackPoint.top() + 1 << "->";
+        // cout << stackPoint.top() + 1 << "->";
         while (!stackPoint.empty())
         {
             // đánh dấu đã thăm
@@ -288,7 +327,7 @@ vector<int> Graph::dfsStack(int startPoint, int typeMatrix)
                 if (listVisitPoint[i] == 0 && adjMatrix[stackPoint.top()][i] > 0)
                 {
                     stackPoint.push(i);
-                    cout << stackPoint.top() + 1 << "->";
+                    // cout << stackPoint.top() + 1 << "->";
                     dfs.push_back(stackPoint.top());
                     count++;
                     break;
@@ -453,4 +492,157 @@ vector<int> Graph::bfsQueue(int startPoint, int typeMatrix)
         break;
     }
     return bfs;
+}
+
+void Graph::removeEdge(int startPoint, int endPoint)
+{
+    adjMatrix[startPoint][endPoint] = 0;
+
+    if (isDirected == SCALAR)
+        adjMatrix[endPoint][startPoint] = 0;
+
+    getListAdjacentPoint();
+}
+
+int Graph::deg(int vertice)
+{
+    int degree = 0;
+    for (int i = 0; i < size; i++)
+    {
+        if (adjMatrix[vertice][i] > 0)
+            degree++;
+    }
+
+    return degree;
+}
+
+bool Graph::isConnected()
+{
+    vector<int> dfs = dfsStack(0, LIST_ADJACENT_POINT);
+    if (dfs.size() == size)
+        return true;
+
+    return false;
+}
+
+bool Graph::isEulerian()
+{
+    bool check = isConnected();
+
+    if (!check)
+        return false;
+
+    switch (isDirected)
+    {
+    case SCALAR:
+    {
+        int oddDegree = 0;
+
+        for (int i = adjMatrix.size() - 1; i >= 0; i--)
+        {
+            int degree = deg(i);
+            if (degree % 2 != 0)
+            {
+                oddDegree++;
+                startPointEulerian = i;
+            }
+        }
+
+        if (oddDegree > 2)
+            return false;
+
+        return true;
+        break;
+    }
+
+    case DIRECTED:
+    {
+        int an = 0, bn = 0;
+
+        vector<int> inward(size, 0), outward(size, 0);
+        for (int i = 0; i < size; i++)
+        {
+            int sum = 0;
+            for (int j = 0; j < size; j++)
+            {
+                if (adjMatrix[i][j])
+                {
+                    inward[j]++; //increase inward edge for destination vertex
+                    sum++;       //how many outward edge
+                }
+            }
+            outward[i] = sum;
+        }
+
+        //check the condition for Euler paths
+        if (inward == outward) //when number inward edges and outward edges for each node is same
+            return true;       //Euler Circuit, it has Euler path
+
+        for (int i = 0; i < size; i++)
+        {
+            if (inward[i] != outward[i])
+            {
+                if ((inward[i] + 1 == outward[i]))
+                {
+                    an++;
+                }
+                else if ((inward[i] == outward[i] + 1))
+                {
+                    bn++;
+                    startPointEulerian = i;
+                }
+            }
+        }
+
+        if (an == 1 && bn == 1)
+        { //if there is only an, and bn, then this has euler path
+            return true;
+        }
+        return false;
+        break;
+    }
+
+    default:
+        break;
+    }
+}
+
+vector<int> Graph::eulerianPath()
+{
+    vector<vector<int> > initialMatrix = adjMatrix;
+
+    vector<int> path;
+
+    if (!isEulerian())
+    {
+        cout << "Graph haven't euler path";
+        return path;
+    }
+
+    stack<int> stackPoint;
+
+    stackPoint.push(startPointEulerian);
+
+    while (!stackPoint.empty())
+    {
+        int point = stackPoint.top();
+
+        if (listAdjacentPoint[point].size() != 0)
+        {
+            int nextPoint = listAdjacentPoint[point][0];
+            stackPoint.push(nextPoint);
+            removeEdge(point, nextPoint);
+        }
+        else
+        {
+            path.push_back(point);
+            stackPoint.pop();
+        }
+    }
+
+    reverse(path.begin(), path.end());
+
+    adjMatrix = initialMatrix;
+
+    return path;
 }
