@@ -308,7 +308,8 @@ vector<int> Graph::dfsStack(int startPoint, int typeMatrix)
     {
     case LIST_ADJACENT_POINT:
     {
-
+        listAdjacentPoint = getListAdjacentPoint();
+        
         stack<int> stackPoint;
 
         vector<int> column(size, 0);
